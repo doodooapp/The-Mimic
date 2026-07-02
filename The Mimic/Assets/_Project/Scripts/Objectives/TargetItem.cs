@@ -10,8 +10,10 @@ namespace TheMimic
         public static event Action<string> AnyCollected;
 
         [SerializeField] string propId;
+        [SerializeField] Color photoColor = Color.white; // placeholder "photo" shown on the phone
 
         public string PropId => propId;
+        public Color PhotoColor => photoColor;
         public bool IsCollected { get; private set; }
 
         // RunDirector turns this off for candidates that aren't part of this run's 3 targets.

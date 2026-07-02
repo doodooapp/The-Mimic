@@ -9,6 +9,9 @@ namespace TheMimic
         [SerializeField] PlayerInteraction interaction;
         [SerializeField] ObjectiveManager objectives;
         [SerializeField] PlayerHideState hideState;
+        [SerializeField] RunDirector runDirector;
+
+        string seedInput = "";
 
         void OnGUI()
         {
@@ -40,6 +43,20 @@ namespace TheMimic
             }
 
             GUI.DrawTexture(new Rect(Screen.width / 2f - 2f, Screen.height / 2f - 2f, 4f, 4f), Texture2D.whiteTexture);
+
+            if (runDirector != null)
+            {
+                float bottom = Screen.height - 32f;
+                GUI.Label(new Rect(10f, bottom, 220f, 22f), $"Seed: {runDirector.CurrentSeed}");
+                seedInput = GUI.TextField(new Rect(230f, bottom, 110f, 22f), seedInput);
+                if (GUI.Button(new Rect(345f, bottom, 140f, 22f), "Set seed + restart")
+                    && int.TryParse(seedInput, out int seed))
+                {
+                    RunDirector.SetPendingSeed(seed);
+                    if (GameManager.Instance != null)
+                        GameManager.Instance.Restart();
+                }
+            }
         }
     }
 }

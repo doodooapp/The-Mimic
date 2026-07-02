@@ -223,3 +223,37 @@ New script: `DeathScreen`. It replaces GameManager's bare overlay with one showi
 1. Get caught by the Mimic: a centered panel shows **YOU DIED**, `The Mimic was disguised as 'Fake_Portrait' at (x, y, z)`, items collected, battery remaining, time survived, and `Press R to restart`. The old bare overlay does NOT also appear.
 2. Win a run (collect 3, exit door): same panel with **YOU ESCAPED** and the same stats.
 3. R restarts cleanly; stats are re-captured fresh on the next run's end.
+
+## Task 8 — Run randomization (RunDirector)
+
+> ### ⚠ MANUAL SCENE SETUP REQUIRED
+> You need 5+ TargetItems and 2+ fake-candidate Props placed in the scene (steps 2–3) before this does anything interesting.
+
+New scripts: `RunDirector`, `RunConfig`. `TargetItem` gains a **Photo Color** field; the phone photos now update per run. DebugHUD gains a seed readout + input field (bottom-left).
+
+### 1. Config asset
+1. In `Assets/_Project/Configs`: **Create > The Mimic > Run Config**, keep name `RunConfig` (**Targets Per Run = 3**).
+
+### 2. Grow the candidate pools
+1. Add 2+ more target items the same way as Task 3 (Prop + TargetItem, unique Prop Ids, e.g. `Radio`, `Vase`) so you have **5+ TargetItems** total.
+2. On every TargetItem, set a distinct **Photo Color** — this is what shows on the phone.
+3. Add 1+ more fake props like Task 4's (Prop only, NO TargetItem, e.g. `Fake_Clock`), so you have **2+ fake candidates**.
+
+### 3. RunDirector
+1. Create an empty GameObject named `RunDirector` → **Add Component > Run Director**, assign:
+   - **Config** → `RunConfig`
+   - **Randomize Seed Each Run** → leave checked (uncheck + set **Inspector Seed** for a fixed run)
+   - **Target Candidates** → ALL TargetItems in the scene (5+)
+   - **Fake Candidates** → ALL fake Props (2+)
+   - **Objectives** → the `Objectives` GameObject
+   - **Mimic** → the `Mimic` GameObject
+   - **Phone UI** → the `PhoneCanvas` object
+2. The Inspector target list on `Objectives` and **Disguised Prop** on the `Mimic` are now just fallbacks — RunDirector overrides both at scene start.
+3. On `HUD`, assign the new **Run Director** field → the `RunDirector` GameObject.
+
+### 4. Pass test
+1. Press Play. Console logs `Seed N: targets [...], fake '...'`. HUD bottom-left shows the seed.
+2. Hold Tab: the 3 photos show the chosen targets' colors + ids (not what you typed in Task 2).
+3. Collecting a NON-chosen target item does nothing (it stays put, count unchanged); the 3 chosen ones count up and unlock the door.
+4. Type a seed (e.g. `42`) into the bottom-left field → **Set seed + restart**: the same 3 targets and same fake are picked every time for that seed. Press R after dying/winning: the seed stays 42 (sticky) — type a new one to change it.
+5. The fake prop per run is whichever candidate the seed picked — check the Console line.
