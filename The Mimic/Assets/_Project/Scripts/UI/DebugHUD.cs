@@ -7,6 +7,7 @@ namespace TheMimic
     {
         [SerializeField] PhoneController phone;
         [SerializeField] PlayerInteraction interaction;
+        [SerializeField] ObjectiveManager objectives;
 
         void OnGUI()
         {
@@ -16,6 +17,12 @@ namespace TheMimic
             {
                 string state = phone.IsDead ? " (DEAD)" : phone.IsRaised ? " (raised)" : "";
                 GUI.Label(new Rect(10f, y, 500f, 22f), $"Battery: {Mathf.CeilToInt(phone.BatteryPercent)}%{state}");
+                y += 22f;
+            }
+
+            if (objectives != null)
+            {
+                GUI.Label(new Rect(10f, y, 500f, 22f), $"Items: {objectives.CollectedCount}/{objectives.TotalCount}");
                 y += 22f;
             }
 

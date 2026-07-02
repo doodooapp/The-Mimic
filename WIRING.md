@@ -89,3 +89,36 @@ New scripts: `PhoneController`, `PhoneConfig`, `PhoneUI`, `DebugHUD`. `PlayerInt
 2. Hold **Tab**: the phone panel appears with 3 colored photos + labels; the battery % visibly counts down both on the panel and the HUD. Release Tab: panel hides and the **battery stops draining**.
 3. Aim at `TestProp`: HUD shows `[E] TestProp` only while aiming within range.
 4. Hold Tab until 0%: the panel closes itself, HUD shows `Battery: 0% (DEAD)`, and Tab does nothing for the rest of the run. Console logs the battery-dead message once.
+
+## Task 3 — Objectives + GameManager
+
+New scripts: `TargetItem`, `ObjectiveManager`, `ExitDoor`, `GameManager`. DebugHUD now shows the collected count.
+
+### 1. Scene must be in the build scene list (needed for restart)
+1. **File > Build Profiles** (or **Build Settings** on older layouts) → **Scene List** → with your working scene open, click **Add Open Scenes**. Without this, pressing R to restart throws a scene-load error.
+
+### 2. GameManager
+1. Create an empty GameObject named `GameManager` → **Add Component > Game Manager**. No fields to set. Keep exactly one in the scene.
+
+### 3. Three target items
+1. Make three small cubes (or reuse `TestProp` as the first): name them `Item_Portrait`, `Item_Clock`, `Item_Teddy`, scatter them around the scene at reachable height.
+2. On each: **Add Component > Prop**, then **Add Component > Target Item**. Set **Prop Id** to `Portrait`, `Clock`, `Teddy` respectively (must match exactly below).
+
+### 4. ObjectiveManager
+1. Create an empty GameObject named `Objectives` → **Add Component > Objective Manager**.
+2. Set **Target Prop Ids** size 3, entries exactly: `Portrait`, `Clock`, `Teddy`.
+
+### 5. ExitDoor
+1. Create a cube named `ExitDoor` (e.g. scale `(1.2, 2.4, 0.15)`), place it against a wall or at the scene edge.
+2. **Add Component > Exit Door**, assign **Objectives** → the `Objectives` GameObject.
+   (Note: ExitDoor is interactable but deliberately NOT a Prop.)
+
+### 6. DebugHUD
+1. On `HUD`, assign the new **Objectives** field → the `Objectives` GameObject.
+
+### 7. Pass test
+1. Press Play. HUD shows `Items: 0/3`.
+2. Press E on the exit door first: Console logs `Locked — 0/3 items collected.`
+3. Collect each item with E: it disappears, HUD counts up, Console logs progress. Collecting the last logs the unlock message.
+4. Press E on the exit door again: **"YOU ESCAPED — Press R to restart"** overlay appears and the game freezes.
+5. Press **R**: the scene reloads, everything is back (items restored, battery full, `Items: 0/3`).
