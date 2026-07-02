@@ -189,3 +189,22 @@ New scripts: `PlayerHideState`, `HidingSpot`. Mimic line-of-sight now respects h
 1. Press Play, walk into the volume: HUD shows `HIDDEN`, Console logs the hiding message. Walk out: `HIDDEN` disappears.
 2. Reveal the Mimic, break its line of sight FIRST, then enter the spot: it patrols past without pursuing even at close range (as long as its sight ray to you is clear of the volume — remember the spot itself is a trigger and doesn't block sight; solid geometry does).
 3. Reveal it, let it chase you with clear sight, and dive into the spot while it's looking: it keeps coming — the exception working as documented. Escape its sight completely and re-enter: you're safe again.
+
+## Task 6 — Reveal atmosphere: light flicker
+
+New scripts: `LightsController`, `FlickerableLight`, `LightsConfig`. On reveal, every registered light flickers violently until the Mimic retreats. No audio (out of scope).
+
+### 1. Config asset
+1. In `Assets/_Project/Configs`: **Create > The Mimic > Lights Config**, keep name `LightsConfig`. Defaults: min 0, max 1.6, interval 0.05.
+
+### 2. Controller
+1. Create an empty GameObject named `Lights` → **Add Component > Lights Controller**, assign **Config** → `LightsConfig`.
+
+### 3. Register lights
+1. On every scene light that should react (e.g. add a few **GameObject > Light > Point Light** around the map at Y ≈ 2.5, Range ~10): **Add Component > Flickerable Light**.
+2. For the effect to be visible, consider making the scene darker: Window > Rendering > Lighting > Environment, drop the ambient/skybox intensity — optional, gray-box.
+
+### 4. Pass test
+1. Press Play, press E on the fake prop: all registered lights strobe/flicker immediately and keep flickering the whole hunt.
+2. When the Console logs `retreating`, every light returns to its exact original intensity.
+3. Lights without a FlickerableLight component are unaffected.
