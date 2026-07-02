@@ -208,3 +208,18 @@ New scripts: `LightsController`, `FlickerableLight`, `LightsConfig`. On reveal, 
 1. Press Play, press E on the fake prop: all registered lights strobe/flicker immediately and keep flickering the whole hunt.
 2. When the Console logs `retreating`, every light returns to its exact original intensity.
 3. Lights without a FlickerableLight component are unaffected.
+
+## Task 7 — Death/Win screen
+
+New script: `DeathScreen`. It replaces GameManager's bare overlay with one showing which prop was the Mimic (id + position) and the run stats — on both death AND win, for playtest discussion.
+
+### 1. Wiring
+1. On the `HUD` GameObject: **Add Component > Death Screen**, assign:
+   - **Phone** → `PlayerCapsule`
+   - **Objectives** → the `Objectives` GameObject
+   - **Mimic** → the `Mimic` GameObject
+
+### 2. Pass test
+1. Get caught by the Mimic: a centered panel shows **YOU DIED**, `The Mimic was disguised as 'Fake_Portrait' at (x, y, z)`, items collected, battery remaining, time survived, and `Press R to restart`. The old bare overlay does NOT also appear.
+2. Win a run (collect 3, exit door): same panel with **YOU ESCAPED** and the same stats.
+3. R restarts cleanly; stats are re-captured fresh on the next run's end.
