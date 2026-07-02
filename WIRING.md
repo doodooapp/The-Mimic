@@ -167,3 +167,25 @@ New scripts: `MimicController`, `MimicConfig`.
 3. Walk into its view cone: it speeds up and chases you. Touch = **"YOU DIED"** overlay.
 4. Press R, reveal it again, then break line of sight (hide behind geometry) and keep away for the hunt duration (20 s default): Console logs `retreating`, the capsule walks to `ReDisguisePoint`, disappears, and the fake cube reappears **at that point**. Interacting with it starts the cycle again.
 5. Known Task-4 limitation (fixed in Task 5): there is no hiding system yet — only distance/geometry breaks line of sight.
+
+## Task 5 — Hiding spots
+
+> ### ⚠ MANUAL SCENE SETUP REQUIRED
+> You must place at least one trigger volume (step 2) — nothing hides you until you do.
+
+New scripts: `PlayerHideState`, `HidingSpot`. Mimic line-of-sight now respects hiding, with one documented exception: **if the Mimic is pursuing you and can see you at the moment you enter a spot, the spot does NOT save you** until it loses sight of you (simplest rule that prevents "dive into the closet mid-chase" exploits).
+
+### 1. Player
+1. Select **PlayerCapsule** → **Add Component > Player Hide State**. No fields.
+2. On `HUD`, assign the new **Hide State** field → `PlayerCapsule`.
+
+### 2. Hiding volumes
+1. Create an empty GameObject named `Closet1` where a closet/bed would be.
+2. **Add Component > Box Collider**, check **Is Trigger**, set Size to roughly `(1.2, 2, 1.2)` — big enough to fully stand inside.
+3. **Add Component > Hiding Spot**.
+4. (Optional) Add a cube child WITHOUT a collider as a visual marker, or leave it invisible for now. If you give the visual its own solid collider, the Mimic's sight ray will treat it as a wall — that's desirable for a closet with walls, but then leave an opening to walk in through.
+
+### 3. Pass test
+1. Press Play, walk into the volume: HUD shows `HIDDEN`, Console logs the hiding message. Walk out: `HIDDEN` disappears.
+2. Reveal the Mimic, break its line of sight FIRST, then enter the spot: it patrols past without pursuing even at close range (as long as its sight ray to you is clear of the volume — remember the spot itself is a trigger and doesn't block sight; solid geometry does).
+3. Reveal it, let it chase you with clear sight, and dive into the spot while it's looking: it keeps coming — the exception working as documented. Escape its sight completely and re-enter: you're safe again.

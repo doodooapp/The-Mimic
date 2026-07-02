@@ -26,14 +26,19 @@ namespace TheMimic
 
         NavMeshAgent agent;
         Prop currentProp;
+        PlayerHideState playerHide;
         bool propAssignedExternally;
         float stateTimer;
         int patrolIndex;
         bool pursuing;
+        bool playerWasHidden;
+        bool hidingIgnored;
 
         void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
+            if (player != null)
+                playerHide = player.GetComponentInChildren<PlayerHideState>(); // optional until Task 5 is wired
 
             if (config == null)
                 Debug.LogError("[Mimic] Config is not assigned. Assign a MimicConfig asset in the Inspector.", this);
@@ -142,6 +147,8 @@ namespace TheMimic
             State = MimicState.Hunting;
             stateTimer = config.huntDuration;
             pursuing = false;
+            playerWasHidden = playerHide != null && playerHide.IsHidden;
+            hidingIgnored = false;
             agent.isStopped = false;
 
             if (patrolPoints == null || patrolPoints.Length == 0)
@@ -152,7 +159,18 @@ namespace TheMimic
 
         void UpdateHunting()
         {
-            bool canSee = CanSeePlayer();
+            bool rawVisible = CanSeePlayer();
+            bool hidden = playerHide != null && playerHide.IsHidden;
+
+            // Simplest correct rule: diving into a spot while the Mimic is pursuing WITH eyes on you
+            // doesn't save you — the spot only starts working once it has lost sight of you.
+            if (hidden && !playerWasHidden && pursuing && rawVisible)
+                hidingIgnored = true;
+            if (!rawVisible || !hidden)
+                hidingIgnored = false;
+            playerWasHidden = hidden;
+
+            bool canSee = rawVisible && (!hidden || hidingIgnored);
 
             if (canSee)
             {

@@ -8,6 +8,7 @@ namespace TheMimic
         [SerializeField] PhoneController phone;
         [SerializeField] PlayerInteraction interaction;
         [SerializeField] ObjectiveManager objectives;
+        [SerializeField] PlayerHideState hideState;
 
         void OnGUI()
         {
@@ -29,6 +30,12 @@ namespace TheMimic
             if (interaction != null && !string.IsNullOrEmpty(interaction.AimedName))
             {
                 GUI.Label(new Rect(10f, y, 500f, 22f), $"[E] {interaction.AimedName}");
+                y += 22f;
+            }
+
+            if (hideState != null && hideState.IsHidden)
+            {
+                GUI.Label(new Rect(10f, y, 500f, 22f), "HIDDEN");
                 y += 22f;
             }
 
