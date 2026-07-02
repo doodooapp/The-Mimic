@@ -86,7 +86,7 @@ namespace TheMimic
 
         void HandleFakeInteracted(Prop _)
         {
-            if (State != MimicState.Disguised)
+            if (State != MimicState.Disguised || config == null || player == null)
                 return;
             if (GameManager.Instance != null && GameManager.Instance.State != GameManager.RunState.Playing)
                 return;
@@ -188,7 +188,10 @@ namespace TheMimic
                     GoToNextPatrolPoint();
             }
 
-            if (Vector3.Distance(transform.position, player.position) <= config.killDistance)
+            // A properly hidden player can't be touched either — otherwise a patrol
+            // brushing past the closet would kill through the hiding spot.
+            if ((!hidden || hidingIgnored) &&
+                Vector3.Distance(transform.position, player.position) <= config.killDistance)
             {
                 Debug.Log("[Mimic] Caught the player.", this);
                 if (GameManager.Instance != null)
