@@ -301,3 +301,24 @@ New scripts: `PlayerConfig`, `PlayerMovementTuner`. The Starter Assets scripts a
 3. Walking feels deliberate (~2.2 m/s — roughly half the old default).
 4. **Hold Ctrl**: camera lowers smoothly, movement slows to ~1.1; walk under the bed slab → HUD shows `HIDDEN`. Release Ctrl while under the bed: you STAY crouched until you walk out (no standing up through the slab), then stand automatically... release Ctrl again if you kept holding — standing happens on release with headroom.
 5. All of it (speeds, sprint toggle, crouch multipliers, sensitivity, smoothing) tunable live from the one `PlayerConfig` asset in Play mode.
+
+## Task 11 — HDRP → URP material converter (for the Vintage Haunted House pack)
+
+New script: `Editor/HdrpToUrpMaterialConverter.cs` (editor-only). Converts HDRP materials — including ones showing `Hidden/InternalErrorShader` — to **URP/Lit** in place: base color + texture + tiling, normal maps, emission, transparency/alpha-clip, and it unpacks HDRP mask maps into generated `_URP_MetallicSmoothness` / `_URP_Occlusion` PNGs.
+
+### 1. Run it
+1. Re-import the pack if you deleted it (double-click `VintageInteriorHDRP.unitypackage`). Expect pink — that's what we're fixing.
+2. In the Project window, **select the `GhostbuGaming` folder** (single click).
+3. Menu: **The Mimic > Convert HDRP Materials To URP** → confirm the dialog. A progress bar runs (the pack is ~1 GB, mask-map unpacking can take a few minutes).
+4. Read the Console report: how many converted, which materials had no base map (stay gray), which base maps were guessed.
+
+### 2. Rules of use
+1. **Do NOT open `DemoSceneHDRP`** — its lighting, volume profiles, and PostFX are HDRP-only and unconvertible. Drag the pack's **prefabs/models** into your own scene instead.
+2. Re-running the converter is safe — already-converted materials are skipped, generated PNGs are reused.
+3. To restore the originals, just re-import the `.unitypackage`.
+4. **Don't commit the pack to git** without telling Claude first (it needs LFS/ignore setup — ~1 GB).
+
+### 3. Pass test
+1. After conversion, the pack's material previews are no longer pink.
+2. Drag a few furniture prefabs into your working scene: textured surfaces, normal detail visible under your point lights.
+3. Console report has no red errors (a "NO BASE MAP" list is possible for custom-shader materials — fix those by assigning **Base Map** manually on each listed material).
