@@ -139,11 +139,15 @@ namespace TheMimic
             mat.SetFloat("_Metallic", saved.Floats.TryGetValue("_Metallic", out float m) ? m : 0f);
             mat.SetFloat("_Smoothness", usedMask ? 1f : (saved.Floats.TryGetValue("_Smoothness", out float s) ? s : 0.5f));
 
-            // Emission
+            // Emission — HDRP emissive colors are HDR physical values (often 100-1400); URP has no
+            // exposure to compensate, so clamp the peak or the material glows like a floodlight.
             Texture emissive = FirstTexture(saved, EmissiveMapNames);
             Color emissiveColor = saved.Colors.TryGetValue("_EmissiveColor", out var ec) ? ec : Color.black;
-            if (emissive != null || emissiveColor.maxColorComponent > 0.001f)
+            float emissivePeak = emissiveColor.maxColorComponent;
+            if (emissivePeak > 0.001f)
             {
+                if (emissivePeak > 1.5f)
+                    emissiveColor *= 1.5f / emissivePeak;
                 if (emissive != null) mat.SetTexture("_EmissionMap", emissive);
                 mat.SetColor("_EmissionColor", emissiveColor);
                 mat.EnableKeyword("_EMISSION");

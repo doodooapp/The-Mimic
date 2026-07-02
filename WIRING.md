@@ -322,3 +322,20 @@ New script: `Editor/HdrpToUrpMaterialConverter.cs` (editor-only). Converts HDRP 
 1. After conversion, the pack's material previews are no longer pink.
 2. Drag a few furniture prefabs into your working scene: textured surfaces, normal detail visible under your point lights.
 3. Console report has no red errors (a "NO BASE MAP" list is possible for custom-shader materials — fix those by assigning **Base Map** manually on each listed material).
+
+## Task 11b — Fix haunted-house brightness + flickering lights
+
+New script: `Editor/HauntedHouseLightingFixer.cs`. Cause of the blowout: the pack's lights use HDRP physical intensities (795 / 3183 — URP expects 1–3) and 5 lamp materials had HDR emissive colors up to 1367. The converter now clamps emission going forward; this tool repairs everything already converted.
+
+### 1. Run it
+1. Open your working scene (the one with the house in it).
+2. **The Mimic > Fix Haunted House Lighting** → **Fix**.
+3. It rescales all 18 house lights (in the prefab, so every scene instance inherits it), adds **FlickerableLight to every house light**, clamps the glowing materials, dims scene ambient to near-dark, and drops any directional "sun" to moonlight (0.15). Console prints exactly what changed.
+
+### 2. Hook the flicker to the Mimic (if not already)
+1. Make sure the scene has the `Lights` GameObject with **Lights Controller** + `LightsConfig` (Task 6). The house lights all self-register now — reveal the Mimic and the whole house strobes.
+
+### 3. Pass test
+1. Press Play: interior looks moody — pools of warm lamp light, dark corners, no blown-out white floors.
+2. Grab the fake prop: every light in the house flickers violently; on retreat they all restore exactly.
+3. Want it darker? Delete the scene's Directional Light and/or lower `LightsConfig`/lamp intensities — all normal Inspector edits now.
