@@ -27,13 +27,13 @@ Material:
   m_Shader: {fileID: 4800000, guid: 6e4ae4064600d784cac1e41a9e6f2e59, type: 3}
   m_Parent: {fileID: 2100000, guid: f624b7b9c3684bd43a72fcaa87cb070a, type: 2}
   m_ModifiedSerializedProperties: 16
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   - _ENABLE_FOG_ON_TRANSPARENT
   - _NORMALMAP_TANGENT_SPACE
   - _REFRACTION_SPHERE
   - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -71,6 +71,7 @@ Material:
     - _ReceivesSSR: 1
     - _RefractionModel: 2
     - _Smoothness: 1
+    - _SrcBlend: 5
     - _StencilRefDepth: 16
     - _StencilWriteMaskDepth: 25
     - _SurfaceType: 1
