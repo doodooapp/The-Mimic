@@ -7,6 +7,7 @@ namespace TheMimic
     // Applies PlayerConfig on top of the Starter Assets FirstPersonController every frame:
     // slower walk, no jump, sprint gated by config, hold-Ctrl crouch, look sensitivity/smoothing.
     // Deliberately does NOT modify the Starter Assets scripts — it drives their public fields.
+    [DefaultExecutionOrder(-50)] // must run before FirstPersonController.Update consumes the jump input
     [RequireComponent(typeof(FirstPersonController))]
     public class PlayerMovementTuner : MonoBehaviour
     {
