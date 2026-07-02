@@ -122,3 +122,48 @@ New scripts: `TargetItem`, `ObjectiveManager`, `ExitDoor`, `GameManager`. DebugH
 3. Collect each item with E: it disappears, HUD counts up, Console logs progress. Collecting the last logs the unlock message.
 4. Press E on the exit door again: **"YOU ESCAPED — Press R to restart"** overlay appears and the game freezes.
 5. Press **R**: the scene reloads, everything is back (items restored, battery full, `Items: 0/3`).
+
+## Task 4 — MimicController
+
+> ### ⚠ MANUAL SCENE SETUP REQUIRED — READ FIRST
+> This task does not work until YOU bake a NavMesh and place patrol/re-disguise points in the scene (steps 1, 4, 5). Unity 6 uses the **AI Navigation** package's `NavMeshSurface` component — do NOT look for the legacy Window > AI > Navigation bake window.
+
+New scripts: `MimicController`, `MimicConfig`.
+
+### 1. Bake the NavMesh
+1. The **AI Navigation** package is already in the project (`com.unity.ai.navigation`). If walls/furniture exist, make sure they and the floor are **not** marked as anything weird — default static geometry is fine.
+2. Select your floor Plane → **Add Component > Nav Mesh Surface** → click **Bake**. A blue overlay should cover the walkable floor (toggle visibility with the scene-view AI Navigation overlay if you don't see it).
+3. Re-bake whenever you move/add large geometry.
+
+### 2. Mimic config asset
+1. In `Assets/_Project/Configs`: **Create > The Mimic > Mimic Config**, keep name `MimicConfig`. Defaults are sensible; tune later.
+
+### 3. Build the Mimic
+1. Create an empty GameObject named `Mimic`, place it in a corner of the map, on the floor.
+2. **Add Component > Mimic Controller** (this auto-adds a **NavMeshAgent** — keep its defaults).
+3. Right-click `Mimic` → **3D Object > Capsule**, name it `Body`, set local position `(0, 1, 0)`. Give it an obvious material color later if you want.
+4. On the `Mimic` root, assign:
+   - **Config** → the `MimicConfig` asset
+   - **Disguised Prop** → the fake prop from step 6
+   - **Player** → the `PlayerCapsule` object
+   - **Body** → the `Body` child
+   - **Patrol Points** → the empties from step 4
+   - **Re Disguise Point** → the empty from step 5
+
+### 4. Patrol points
+1. Create 3–4 empty GameObjects named `PatrolPoint1..4`, spread across the walkable floor (on the blue NavMesh). Assign them to the Mimic's **Patrol Points** array.
+
+### 5. Re-disguise point
+1. Create one empty GameObject named `ReDisguisePoint` somewhere on the NavMesh (this is where the fake prop reappears after a hunt). Assign it.
+
+### 6. The fake prop
+1. Create a cube named `Fake_Portrait` (visually it's a "flawed copy" — for gray-box, just another cube). Place it somewhere plausible.
+2. **Add Component > Prop**. Do **NOT** add a TargetItem to it — the fake is never collectible.
+3. Assign it as the Mimic's **Disguised Prop**.
+
+### 7. Pass test
+1. Press Play. The Mimic body is invisible; the fake cube sits in the scene. HUD prompt shows `[E] Fake_Portrait` when aimed at.
+2. Press E on the fake: the cube vanishes, Console logs `REVEALED`, and after ~1.5 s a capsule appears there and starts patrolling between your points.
+3. Walk into its view cone: it speeds up and chases you. Touch = **"YOU DIED"** overlay.
+4. Press R, reveal it again, then break line of sight (hide behind geometry) and keep away for the hunt duration (20 s default): Console logs `retreating`, the capsule walks to `ReDisguisePoint`, disappears, and the fake cube reappears **at that point**. Interacting with it starts the cycle again.
+5. Known Task-4 limitation (fixed in Task 5): there is no hiding system yet — only distance/geometry breaks line of sight.
