@@ -86,9 +86,11 @@ namespace TheMimic
             Box(hiding, "Closet_Body", new Vector3(-4.8f, 1.1f, 7.5f), new Vector3(0.6f, 2.2f, 1.5f), matBedroom);
             HidingVolume(hiding, "Closet_HidingVolume", new Vector3(-5.5f, 1f, 7.5f), new Vector3(0.8f, 2f, 1.5f));
 
-            // Bed slab with 0.5 m clearance underneath, against the bedroom south wall.
-            Box(hiding, "Bed_Slab", new Vector3(-2.5f, 0.6f, 6.1f), new Vector3(1.6f, 0.2f, 2f), matBedroom);
-            HidingVolume(hiding, "UnderBed_HidingVolume", new Vector3(-2.5f, 0.25f, 6.1f), new Vector3(1.6f, 0.5f, 2f));
+            // Bed slab against the bedroom south wall. Clearance is 1.2 m (not the original 0.5 m):
+            // a crouched CharacterController is still ~1.0 m tall (capsule height can't go below
+            // 2x its 0.5 radius), so 0.5 m could never be entered.
+            Box(hiding, "Bed_Slab", new Vector3(-2.5f, 1.3f, 6.1f), new Vector3(1.6f, 0.2f, 2f), matBedroom);
+            HidingVolume(hiding, "UnderBed_HidingVolume", new Vector3(-2.5f, 0.6f, 6.1f), new Vector3(1.6f, 1.2f, 2f));
 
             Selection.activeGameObject = root;
             EditorSceneManager.MarkSceneDirty(root.scene);
@@ -104,8 +106,7 @@ namespace TheMimic
                 "3. Move PlayerCapsule to the front door: position (0, 1, 1). Also move the Mimic, its\n" +
                 "   ReDisguisePoint, all items/fakes, and the ExitDoor inside rooms (ExitDoor fits the front\n" +
                 "   doorway at (0, 1.2, 0)).\n" +
-                "4. Note: the under-bed hiding volume needs a crouch to enter (0.5 m clearance) — crouch is\n" +
-                "   out of scope for now, so use the closet gap to test hiding.");
+                "4. Note: the under-bed hiding volume needs a crouch to enter (hold Ctrl, Task 10).");
         }
 
         static void LoadOrCreateMaterials()

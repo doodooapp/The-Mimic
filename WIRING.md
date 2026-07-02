@@ -277,3 +277,27 @@ New script: `Editor/HouseGenerator.cs` (editor-only; adds a menu item, ships not
 2. NavMesh bake covers all floors; reveal the Mimic and watch it patrol through the rooms without snagging on doorways.
 3. The closet gap in the bedroom (behind the box on the west wall) flags `HIDDEN`.
 4. Known limitation: the under-bed volume needs a crouch (0.5 m clearance) — untestable until crouch exists; the closet is the testable spot.
+
+## Task 10 — Player movement tuning (horror pacing)
+
+New scripts: `PlayerConfig`, `PlayerMovementTuner`. The Starter Assets scripts are untouched — the tuner drives the FirstPersonController's public fields from the config every frame. The **Crouch** action's keyboard binding moved from **C** to **Left Ctrl**, and the bed in the house generator was raised to 1.2 m clearance (a crouched CharacterController is ~1 m tall — 0.5 m was physically impossible to enter).
+
+### 1. Config asset
+1. In `Assets/_Project/Configs`: **Create > The Mimic > Player Config**, keep name `PlayerConfig`.
+2. Defaults: **Walk Speed 2.2**, **Sprint Enabled OFF** (tick it for A/B playtests), **Sprint Speed 4.5**, crouch multipliers 0.5, **Look Sensitivity 1**, **Look Smoothing 0** (try 0.05–0.1 if raw feels twitchy).
+
+### 2. Tuner on the player
+1. Select **PlayerCapsule** → **Add Component > Player Movement Tuner**, assign:
+   - **Config** → the `PlayerConfig` asset
+   - **Crouch Action** → circle picker, search `Crouch`, pick **Player/Crouch**
+   - **Camera Root** → the **PlayerCameraRoot** child of PlayerCapsule (drag from the Hierarchy)
+
+### 3. Regenerate the house (for the raised bed)
+1. **The Mimic > Generate Gray-box House** again, then re-**Bake** the NavMeshSurface. (Remember: regenerating replaces the whole `House` root.)
+
+### 4. Pass test
+1. **Space does nothing** — no jump, ever.
+2. **Shift does nothing** — same speed with or without it. Tick **Sprint Enabled** on the config asset during Play mode: Shift now sprints at 4.5. Untick — gone again.
+3. Walking feels deliberate (~2.2 m/s — roughly half the old default).
+4. **Hold Ctrl**: camera lowers smoothly, movement slows to ~1.1; walk under the bed slab → HUD shows `HIDDEN`. Release Ctrl while under the bed: you STAY crouched until you walk out (no standing up through the slab), then stand automatically... release Ctrl again if you kept holding — standing happens on release with headroom.
+5. All of it (speeds, sprint toggle, crouch multipliers, sensitivity, smoothing) tunable live from the one `PlayerConfig` asset in Play mode.
