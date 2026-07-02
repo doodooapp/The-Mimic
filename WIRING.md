@@ -257,3 +257,23 @@ New scripts: `RunDirector`, `RunConfig`. `TargetItem` gains a **Photo Color** fi
 3. Collecting a NON-chosen target item does nothing (it stays put, count unchanged); the 3 chosen ones count up and unlock the door.
 4. Type a seed (e.g. `42`) into the bottom-left field → **Set seed + restart**: the same 3 targets and same fake are picked every time for that seed. Press R after dying/winning: the seed stays 42 (sticky) — type a new one to change it.
 5. The fake prop per run is whichever candidate the seed picked — check the Console line.
+
+## Task 9 — Gray-box house generator
+
+New script: `Editor/HouseGenerator.cs` (editor-only; adds a menu item, ships nothing at runtime).
+
+### 1. Generate
+1. Menu bar: **The Mimic > Generate Gray-box House**. One click builds everything under a `House` root: 5 spaces (hallway, living, kitchen, bedroom, basement stand-in), floors + ceilings, doorways with lintels, per-room gray shades (material assets in `Assets/_Project/Generated/`), sightline breakers, `PatrolPoints` (6 children), and 2 bedroom hiding spots (closet gap + under-bed).
+2. Re-running the menu item deletes the old `House` and rebuilds — don't hand-edit inside `House`, it's disposable.
+
+### 2. Re-wire the scene to the house (the Console prints these too)
+1. Delete/disable the old ground **Plane**. Put the **NavMeshSurface** on the `House` root (Add Component if needed) and click **Bake**. Blue overlay should cover every room and flow through all 5 doorways. If a doorway pinches shut, lower the agent radius to **0.4** (Window > AI > Navigation > Agents) and re-bake.
+2. Select the `Mimic` → replace the **Patrol Points** array with the 6 `PP_*` children of `House/PatrolPoints`.
+3. Move **PlayerCapsule** to the front door: `(0, 1, 1)`. Move the `Mimic` + `ReDisguisePoint` into rooms (on the NavMesh), scatter the target items/fakes through different rooms, and put the `ExitDoor` in the front doorway at `(0, 1.2, 0)`.
+4. Spread your Task 6 point lights so each room has one.
+
+### 3. Pass test
+1. One menu click produces the house; walk every room — no wall gaps, all 5 doorways passable.
+2. NavMesh bake covers all floors; reveal the Mimic and watch it patrol through the rooms without snagging on doorways.
+3. The closet gap in the bedroom (behind the box on the west wall) flags `HIDDEN`.
+4. Known limitation: the under-bed volume needs a crouch (0.5 m clearance) — untestable until crouch exists; the closet is the testable spot.
