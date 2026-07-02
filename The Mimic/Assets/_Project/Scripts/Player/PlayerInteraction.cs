@@ -23,16 +23,12 @@ namespace TheMimic
                 Debug.LogError("[PlayerInteraction] No camera found. Assign the player camera or tag it MainCamera.", this);
         }
 
+        // No matching Disable(): the action belongs to the shared InputSystem_Actions asset,
+        // so disabling it here would kill it for every other consumer. Update() stopping is enough.
         void OnEnable()
         {
             if (interactAction != null)
                 interactAction.action.Enable();
-        }
-
-        void OnDisable()
-        {
-            if (interactAction != null)
-                interactAction.action.Disable();
         }
 
         void Update()
