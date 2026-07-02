@@ -3,12 +3,17 @@ using UnityEngine.InputSystem;
 
 namespace TheMimic
 {
-    // Raycasts from the camera crosshair and calls Interact() on whatever the player presses E on.
+    // Raycasts from the camera crosshair, tracks what it's aimed at, and calls Interact() on it when the player presses E.
     public class PlayerInteraction : MonoBehaviour
     {
         [SerializeField] InteractionConfig config;
         [SerializeField] Camera playerCamera;
         [SerializeField] InputActionReference interactAction;
+
+        // Name of the interactable under the crosshair, for the HUD prompt. Null when there is none.
+        public string AimedName { get; private set; }
+
+        IInteractable aimed;
 
         void Awake()
         {
@@ -33,20 +38,26 @@ namespace TheMimic
 
         void Update()
         {
-            if (interactAction != null && interactAction.action.WasPressedThisFrame())
-                TryInteract();
+            UpdateAim();
+
+            if (aimed != null && interactAction != null && interactAction.action.WasPressedThisFrame())
+                aimed.Interact();
         }
 
-        void TryInteract()
+        void UpdateAim()
         {
+            aimed = null;
+            AimedName = null;
+
             if (playerCamera == null || config == null)
                 return;
 
             Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             if (Physics.Raycast(ray, out RaycastHit hit, config.interactRange, config.interactLayers, QueryTriggerInteraction.Ignore))
             {
-                IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
-                interactable?.Interact();
+                aimed = hit.collider.GetComponentInParent<IInteractable>();
+                if (aimed is Component component)
+                    AimedName = component.name;
             }
         }
     }

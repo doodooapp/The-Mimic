@@ -51,3 +51,41 @@ Follow each task's steps literally, in order. Done when the test at the end of t
 
 ### Tags / Layers
 None needed for Task 1. The interaction raycast uses **Everything** and ignores trigger colliders.
+
+## Task 2 — PhoneController + DebugHUD
+
+New scripts: `PhoneController`, `PhoneConfig`, `PhoneUI`, `DebugHUD`. `PlayerInteraction` now also tracks what you're aiming at for the HUD prompt. A **Phone** action (hold **Tab**) was added to `InputSystem_Actions` — Unity picks it up automatically on reimport.
+
+### 1. Phone config asset
+1. In `Assets/_Project/Configs`: **Create > The Mimic > Phone Config**. Keep the name `PhoneConfig`.
+2. Defaults: **Start Percent = 100**, **Drain Per Second = 4** (25 s of total phone time — tune later).
+
+### 2. Phone UI canvas
+1. **GameObject > UI > Canvas**, name it `PhoneCanvas` (Render Mode: Screen Space - Overlay is the default — keep it). This also creates an EventSystem — keep it.
+2. Right-click `PhoneCanvas` → **Create Empty**, name it `PhonePanel`. In its Rect Transform, click the anchor square and pick **stretch/stretch** (bottom-right icon while holding Alt) so it fills the screen.
+3. Right-click `PhonePanel` → **UI > Image**, name it `PhoneBackground`. Set its anchors to center, **Width 400, Height 600**, and its Image color to dark gray, alpha ~230.
+4. Inside `PhonePanel`, create three **UI > Image** objects: `Photo1`, `Photo2`, `Photo3`. Size each **Width 300, Height 140**, positioned vertically inside the background (e.g. Pos Y = 150, 0, -150). Give them three different obvious colors (red / green / blue).
+5. Inside each photo Image, right-click → **UI > Legacy > Text**, name them `Label1/2/3`. Type a placeholder belonging name in each (e.g. `Portrait`, `Clock`, `Teddy`). Color: white, Font Size 24.
+6. Inside `PhonePanel`, add one more **UI > Legacy > Text** named `BatteryText`, anchored to the top of the background (Pos Y ≈ 260), Font Size 28, white. Text can say `Battery 100%`.
+7. Select `PhoneCanvas` (the root, NOT the panel) → **Add Component > Phone UI** and assign:
+   - **Panel Root** → `PhonePanel`
+   - **Battery Text** → `BatteryText`
+   - **Photo Slots** (size 3) → `Photo1`, `Photo2`, `Photo3`
+   - **Photo Labels** (size 3) → `Label1`, `Label2`, `Label3`
+
+### 3. PhoneController on the player
+1. Select **PlayerCapsule** → **Add Component > Phone Controller**, assign:
+   - **Config** → the `PhoneConfig` asset
+   - **Phone Action** → circle picker, search `Phone`, pick **Player/Phone**
+   - **Phone UI** → the `PhoneCanvas` object (it has the PhoneUI component)
+
+### 4. DebugHUD
+1. Create an empty GameObject named `HUD` → **Add Component > Debug HUD**, assign:
+   - **Phone** → `PlayerCapsule` (PhoneController)
+   - **Interaction** → `PlayerCapsule` (PlayerInteraction)
+
+### 5. Pass test
+1. Press Play. You see a **white crosshair dot** at screen center and `Battery: 100%` top-left.
+2. Hold **Tab**: the phone panel appears with 3 colored photos + labels; the battery % visibly counts down both on the panel and the HUD. Release Tab: panel hides and the **battery stops draining**.
+3. Aim at `TestProp`: HUD shows `[E] TestProp` only while aiming within range.
+4. Hold Tab until 0%: the panel closes itself, HUD shows `Battery: 0% (DEAD)`, and Tab does nothing for the rest of the run. Console logs the battery-dead message once.
